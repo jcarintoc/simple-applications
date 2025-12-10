@@ -1,27 +1,57 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useUser, useLogout } from "@/lib/query";
-import { bookmarkApi, type CreateBookmarkDto, type UpdateBookmarkDto } from "@/lib/api";
-import { BookmarkForm, BookmarkList, BookmarkFilters } from "@/components/bookmarks";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { Plus } from "lucide-react";
+import {
+  bookmarkApi,
+  type CreateBookmarkDto,
+  type UpdateBookmarkDto,
+} from "@/lib/api";
+import {
+  BookmarkForm,
+  BookmarkList,
+  BookmarkFilters,
+} from "@/components/bookmarks";
+import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
 
 export function DashboardPage() {
-  const { data: userData, isLoading: isUserLoading } = useUser();
-  const logoutMutation = useLogout();
   const queryClient = useQueryClient();
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
 
-  const { data: bookmarks = [], isLoading: isBookmarksLoading } = useQuery({
-    queryKey: ["bookmarks", searchQuery, selectedTags],
-    queryFn: () => bookmarkApi.getBookmarks({
-      search: searchQuery || undefined,
-      tags: selectedTags.length > 0 ? selectedTags : undefined,
-    }),
+  const { data, isLoading: isBookmarksLoading } = useQuery({
+    queryKey: ["bookmarks", searchQuery, selectedTags, page, limit],
+    queryFn: () =>
+      bookmarkApi.getBookmarks({
+        search: searchQuery || undefined,
+        tags: selectedTags.length > 0 ? selectedTags : undefined,
+        page,
+        limit,
+      }),
   });
+
+  const bookmarks = data?.data || [];
+  const pagination = data?.pagination;
 
   const { data: tags = [] } = useQuery({
     queryKey: ["tags"],
@@ -34,6 +64,10 @@ export function DashboardPage() {
       queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
       queryClient.invalidateQueries({ queryKey: ["tags"] });
       setIsAddDialogOpen(false);
+      toast.success("Bookmark created successfully");
+    },
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 
@@ -43,6 +77,10 @@ export function DashboardPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
       queryClient.invalidateQueries({ queryKey: ["tags"] });
+      toast.success("Bookmark updated successfully");
+    },
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 
@@ -51,15 +89,15 @@ export function DashboardPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
       queryClient.invalidateQueries({ queryKey: ["tags"] });
+      toast.success("Bookmark deleted successfully");
+    },
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 
-  const handleLogout = () => {
-    logoutMutation.mutate();
-  };
-
-  const handleCreate = async (data: CreateBookmarkDto) => {
-    await createMutation.mutateAsync(data);
+  const handleCreate = async (data: CreateBookmarkDto | UpdateBookmarkDto) => {
+    await createMutation.mutateAsync(data as CreateBookmarkDto);
   };
 
   const handleUpdate = async (id: number, data: UpdateBookmarkDto) => {
@@ -70,61 +108,100 @@ export function DashboardPage() {
     await deleteMutation.mutateAsync(id);
   };
 
-  if (isUserLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50">
-        <div className="text-slate-600 font-medium">Loading...</div>
-      </div>
-    );
-  }
+  const copyToClipboard = (url: string) => {
+    navigator.clipboard.writeText(url);
+    toast.success("URL copied to clipboard");
+  };
 
-  const user = userData?.user;
+  // Reset to page 1 when search or tags change
+  useEffect(() => {
+    setPage(1);
+  }, [searchQuery, selectedTags]);
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const renderPaginationItems = () => {
+    if (!pagination) return null;
+
+    const items = [];
+    const { totalPages, page: currentPage } = pagination;
+
+    // Show first page
+    if (currentPage > 2) {
+      items.push(
+        <PaginationItem key={1}>
+          <PaginationLink onClick={() => handlePageChange(1)} isActive={currentPage === 1}>
+            1
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+
+    // Show ellipsis if needed
+    if (currentPage > 3) {
+      items.push(
+        <PaginationItem key="ellipsis-start">
+          <span className="px-4 text-slate-500">...</span>
+        </PaginationItem>
+      );
+    }
+
+    // Show pages around current page
+    for (let i = Math.max(1, currentPage - 1); i <= Math.min(totalPages, currentPage + 1); i++) {
+      items.push(
+        <PaginationItem key={i}>
+          <PaginationLink onClick={() => handlePageChange(i)} isActive={i === currentPage}>
+            {i}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+
+    // Show ellipsis if needed
+    if (currentPage < totalPages - 2) {
+      items.push(
+        <PaginationItem key="ellipsis-end">
+          <span className="px-4 text-slate-500">...</span>
+        </PaginationItem>
+      );
+    }
+
+    // Show last page
+    if (currentPage < totalPages - 1) {
+      items.push(
+        <PaginationItem key={totalPages}>
+          <PaginationLink onClick={() => handlePageChange(totalPages)} isActive={currentPage === totalPages}>
+            {totalPages}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+
+    return items;
+  };
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-8">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                  </svg>
-                </div>
-                <h1 className="text-xl font-bold text-slate-900">Bookmarks</h1>
-              </div>
-              <div className="hidden md:flex items-center gap-2 text-sm">
-                <span className="text-slate-400">signed in as</span>
-                <span className="font-medium text-slate-700">{user?.email}</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                onClick={() => setIsAddDialogOpen(true)}
-                size="sm"
-                className="bg-blue-600 hover:bg-blue-700 shadow-sm"
-              >
-                <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                New
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleLogout}
-                disabled={logoutMutation.isPending}
-                className="text-slate-600 hover:text-slate-900"
-              >
-                {logoutMutation.isPending ? "Signing out..." : "Sign out"}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
+    <>
       <div className="mx-auto max-w-7xl px-6 py-8">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900">My Bookmarks</h2>
+            <Badge className="bg-blue-100 text-blue-600 mt-2">
+              {pagination?.total || 0} {pagination?.total === 1 ? "bookmark" : "bookmarks"} saved
+            </Badge>
+          </div>
+          <Button
+            onClick={() => setIsAddDialogOpen(true)}
+            size="sm"
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            <Plus className="w-4 h-4" /> New Bookmark
+          </Button>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
           <aside className="space-y-6">
             <BookmarkFilters
@@ -136,13 +213,36 @@ export function DashboardPage() {
             />
           </aside>
 
-          <main>
+          <main className="space-y-6">
             <BookmarkList
               bookmarks={bookmarks}
               onUpdate={handleUpdate}
               onDelete={handleDelete}
+              onCopyToClipboard={copyToClipboard}
               isLoading={isBookmarksLoading}
             />
+
+            {pagination && pagination.totalPages > 1 && (
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() => handlePageChange(Math.max(1, page - 1))}
+                      className={page === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+
+                  {renderPaginationItems()}
+
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() => handlePageChange(Math.min(pagination.totalPages, page + 1))}
+                      className={page === pagination.totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            )}
           </main>
         </div>
       </div>
@@ -151,7 +251,9 @@ export function DashboardPage() {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Add Bookmark</DialogTitle>
-            <DialogDescription>Save a new link to your collection</DialogDescription>
+            <DialogDescription>
+              Save a new link to your collection
+            </DialogDescription>
           </DialogHeader>
           <BookmarkForm
             onSubmit={handleCreate}
@@ -160,6 +262,6 @@ export function DashboardPage() {
           />
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

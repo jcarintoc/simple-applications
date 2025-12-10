@@ -224,7 +224,7 @@ export const swaggerDocument = {
       get: {
         tags: ["Bookmarks"],
         summary: "Get all bookmarks",
-        description: "Returns all bookmarks for the authenticated user with optional filtering",
+        description: "Returns paginated bookmarks for the authenticated user with optional filtering",
         parameters: [
           {
             name: "search",
@@ -238,18 +238,39 @@ export const swaggerDocument = {
             schema: { type: "string" },
             description: "Comma-separated list of tag names to filter by",
           },
+          {
+            name: "page",
+            in: "query",
+            schema: { type: "integer", default: 1 },
+            description: "Page number for pagination",
+          },
+          {
+            name: "limit",
+            in: "query",
+            schema: { type: "integer", default: 10 },
+            description: "Number of items per page",
+          },
         ],
         responses: {
           200: {
-            description: "List of bookmarks",
+            description: "Paginated list of bookmarks",
             content: {
               "application/json": {
                 schema: {
                   type: "object",
                   properties: {
-                    bookmarks: {
+                    data: {
                       type: "array",
                       items: { $ref: "#/components/schemas/BookmarkWithTags" },
+                    },
+                    pagination: {
+                      type: "object",
+                      properties: {
+                        page: { type: "integer", example: 1 },
+                        limit: { type: "integer", example: 10 },
+                        total: { type: "integer", example: 42 },
+                        totalPages: { type: "integer", example: 5 },
+                      },
                     },
                   },
                 },

@@ -16,10 +16,17 @@ interface BookmarkFormProps {
   isLoading?: boolean;
 }
 
-export function BookmarkForm({ initialData, onSubmit, onCancel, isLoading }: BookmarkFormProps) {
-  const [url, setUrl] = useState(initialData?.url || "");
+export function BookmarkForm({
+  initialData,
+  onSubmit,
+  onCancel,
+  isLoading,
+}: BookmarkFormProps) {
+  const [url, setUrl] = useState(initialData?.url || "https://");
   const [title, setTitle] = useState(initialData?.title || "");
-  const [description, setDescription] = useState(initialData?.description || "");
+  const [description, setDescription] = useState(
+    initialData?.description || ""
+  );
   const [tags, setTags] = useState(initialData?.tags?.join(", ") || "");
   const [error, setError] = useState("");
 
@@ -109,7 +116,12 @@ export function BookmarkForm({ initialData, onSubmit, onCancel, isLoading }: Boo
 
       <div className="flex gap-2 justify-end">
         {onCancel && (
-          <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            disabled={isLoading}
+          >
             Cancel
           </Button>
         )}

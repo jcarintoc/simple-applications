@@ -1,5 +1,5 @@
 import { db } from "../db/database.js";
-import type { Bookmark, BookmarkWithTags, Tag, CreateBookmarkDto, UpdateBookmarkDto, BookmarkFilters } from "../types/index.js";
+import type { Bookmark, BookmarkWithTags, Tag, CreateBookmarkDto, UpdateBookmarkDto, BookmarkFilters, PaginatedResponse } from "../types/index.js";
 
 export class BookmarkRepository {
   findById(id: number): Bookmark | undefined {
@@ -15,19 +15,24 @@ export class BookmarkRepository {
     return { ...bookmark, tags };
   }
 
-  findByUserId(userId: number, filters?: BookmarkFilters): BookmarkWithTags[] {
+  findByUserId(userId: number, filters?: BookmarkFilters): PaginatedResponse<BookmarkWithTags> {
+    let countQuery = "SELECT COUNT(*) as total FROM bookmarks WHERE user_id = ?";
     let query = "SELECT * FROM bookmarks WHERE user_id = ?";
     const params: (string | number | string[])[] = [userId];
+    const countParams: (string | number | string[])[] = [userId];
 
     if (filters?.search) {
-      query += " AND (title LIKE ? OR description LIKE ? OR url LIKE ?)";
+      const searchCondition = " AND (title LIKE ? OR description LIKE ? OR url LIKE ?)";
+      query += searchCondition;
+      countQuery += searchCondition;
       const searchPattern = `%${filters.search}%`;
       params.push(searchPattern, searchPattern, searchPattern);
+      countParams.push(searchPattern, searchPattern, searchPattern);
     }
 
     if (filters?.tags && filters.tags.length > 0) {
       const placeholders = filters.tags.map(() => "?").join(",");
-      query += ` AND id IN (
+      const tagCondition = ` AND id IN (
         SELECT DISTINCT bt.bookmark_id
         FROM bookmark_tags bt
         INNER JOIN tags t ON bt.tag_id = t.id
@@ -35,18 +40,41 @@ export class BookmarkRepository {
         GROUP BY bt.bookmark_id
         HAVING COUNT(DISTINCT t.id) = ?
       )`;
+      query += tagCondition;
+      countQuery += tagCondition;
       params.push(...filters.tags, filters.tags.length);
+      countParams.push(...filters.tags, filters.tags.length);
     }
 
-    query += " ORDER BY updated_at DESC";
+    // Get total count
+    const countStmt = db.prepare(countQuery);
+    const { total } = countStmt.get(...countParams) as { total: number };
+
+    // Add pagination
+    const page = filters?.page || 1;
+    const limit = filters?.limit || 10;
+    const offset = (page - 1) * limit;
+
+    query += " ORDER BY updated_at DESC LIMIT ? OFFSET ?";
+    params.push(limit, offset);
 
     const stmt = db.prepare(query);
     const bookmarks = stmt.all(...params) as Bookmark[];
 
-    return bookmarks.map(bookmark => ({
+    const data = bookmarks.map(bookmark => ({
       ...bookmark,
       tags: this.getTagsForBookmark(bookmark.id),
     }));
+
+    return {
+      data,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   create(userId: number, data: CreateBookmarkDto): BookmarkWithTags {
@@ -152,8 +180,25 @@ export class BookmarkRepository {
   }
 
   getAllTags(): Tag[] {
-    const stmt = db.prepare("SELECT * FROM tags ORDER BY name");
+    const stmt = db.prepare(`
+      SELECT DISTINCT t.*
+      FROM tags t
+      INNER JOIN bookmark_tags bt ON t.id = bt.tag_id
+      ORDER BY t.name
+    `);
     return stmt.all() as Tag[];
+  }
+
+  getTagsByUserId(userId: number): Tag[] {
+    const stmt = db.prepare(`
+      SELECT DISTINCT t.*
+      FROM tags t
+      INNER JOIN bookmark_tags bt ON t.id = bt.tag_id
+      INNER JOIN bookmarks b ON bt.bookmark_id = b.id
+      WHERE b.user_id = ?
+      ORDER BY t.name
+    `);
+    return stmt.all(userId) as Tag[];
   }
 }
 

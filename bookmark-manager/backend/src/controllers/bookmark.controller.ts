@@ -9,11 +9,13 @@ export class BookmarkController {
     const filters: BookmarkFilters = {
       search: req.query.search as string | undefined,
       tags: req.query.tags ? (req.query.tags as string).split(",") : undefined,
+      page: req.query.page ? parseInt(req.query.page as string) : undefined,
+      limit: req.query.limit ? parseInt(req.query.limit as string) : undefined,
     };
 
     try {
-      const bookmarks = bookmarkService.getBookmarks(userId, filters);
-      res.json({ bookmarks });
+      const result = bookmarkService.getBookmarks(userId, filters);
+      res.json(result);
     } catch (error) {
       this.handleError(res, error, "Failed to fetch bookmarks");
     }
@@ -100,9 +102,10 @@ export class BookmarkController {
     }
   }
 
-  getTags(_req: AuthRequest, res: Response): void {
+  getTags(req: AuthRequest, res: Response): void {
+    const userId = req.userId!;
     try {
-      const tags = bookmarkService.getAllTags();
+      const tags = bookmarkService.getAllTags(userId);
       res.json({ tags });
     } catch (error) {
       this.handleError(res, error, "Failed to fetch tags");

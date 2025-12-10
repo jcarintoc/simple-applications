@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { Button } from "../ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,14 +15,21 @@ import {
 } from "../ui/dropdown-menu";
 import { BookmarkForm } from "./BookmarkForm";
 import type { BookmarkWithTags, UpdateBookmarkDto } from "../../lib/api";
+import { Copy, EllipsisVertical, Pencil, Trash } from "lucide-react";
 
 interface BookmarkCardProps {
   bookmark: BookmarkWithTags;
   onUpdate: (id: number, data: UpdateBookmarkDto) => Promise<void>;
   onDelete: (id: number) => Promise<void>;
+  onCopyToClipboard: (url: string) => void;
 }
 
-export function BookmarkCard({ bookmark, onUpdate, onDelete }: BookmarkCardProps) {
+export function BookmarkCard({
+  bookmark,
+  onUpdate,
+  onDelete,
+  onCopyToClipboard,
+}: BookmarkCardProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -66,7 +79,7 @@ export function BookmarkCard({ bookmark, onUpdate, onDelete }: BookmarkCardProps
                 href={bookmark.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block font-semibold text-slate-900 hover:text-blue-600 transition-colors line-clamp-2"
+                className="block font-semibold text-slate-900 hover:text-blue-600 transition-colors line-clamp-2 w-fit"
               >
                 {bookmark.title}
               </a>
@@ -78,26 +91,26 @@ export function BookmarkCard({ bookmark, onUpdate, onDelete }: BookmarkCardProps
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="p-1.5 text-slate-400 hover:text-slate-600 rounded hover:bg-slate-100">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                  </svg>
-                </button>
+                <Button variant={"ghost"} size={"icon-sm"}>
+                  <EllipsisVertical />
+                </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() => onCopyToClipboard(bookmark.url)}
+                >
+                  <Copy className="size-4 mr-1" />
+                  Copy
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
+                  <Pencil className="size-4 mr-1" />
                   Edit
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => setIsDeleteDialogOpen(true)}
                   className="text-red-600 focus:text-red-600"
                 >
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
+                  <Trash className="text-red-600 size-4 mr-1" />
                   Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -105,7 +118,9 @@ export function BookmarkCard({ bookmark, onUpdate, onDelete }: BookmarkCardProps
           </div>
 
           {bookmark.description && (
-            <p className="text-sm text-slate-600 line-clamp-2">{bookmark.description}</p>
+            <p className="text-sm text-slate-600 line-clamp-2">
+              {bookmark.description}
+            </p>
           )}
 
           {bookmark.tags.length > 0 && (
@@ -148,7 +163,8 @@ export function BookmarkCard({ bookmark, onUpdate, onDelete }: BookmarkCardProps
           <DialogHeader>
             <DialogTitle>Delete Bookmark</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{bookmark.title}"? This action cannot be undone.
+              Are you sure you want to delete "{bookmark.title}"? This action
+              cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <div className="flex gap-2 justify-end mt-4">
@@ -159,7 +175,11 @@ export function BookmarkCard({ bookmark, onUpdate, onDelete }: BookmarkCardProps
             >
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={isLoading}>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isLoading}
+            >
               {isLoading ? "Deleting..." : "Delete"}
             </Button>
           </div>

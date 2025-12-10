@@ -5,13 +5,16 @@ import {
 } from "react-router-dom";
 import { LoginPage, RegisterPage, DashboardPage } from "@/pages";
 import { ProtectedRoute, PublicRoute } from "@/components/routes";
+import { MainLayout } from "@/layouts/MainLayout";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
     <>
       {/* Protected Routes - require authentication */}
       <Route element={<ProtectedRoute />}>
-        <Route path="/" element={<DashboardPage />} />
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<DashboardPage />} />
+        </Route>
       </Route>
 
       {/* Public Routes - redirect to dashboard if already logged in */}

@@ -1,8 +1,8 @@
 import { bookmarkRepository } from "../repositories/index.js";
-import type { BookmarkWithTags, CreateBookmarkDto, UpdateBookmarkDto, BookmarkFilters, Tag } from "../types/index.js";
+import type { BookmarkWithTags, CreateBookmarkDto, UpdateBookmarkDto, BookmarkFilters, Tag, PaginatedResponse } from "../types/index.js";
 
 export class BookmarkService {
-  getBookmarks(userId: number, filters?: BookmarkFilters): BookmarkWithTags[] {
+  getBookmarks(userId: number, filters?: BookmarkFilters): PaginatedResponse<BookmarkWithTags> {
     return bookmarkRepository.findByUserId(userId, filters);
   }
 
@@ -34,8 +34,8 @@ export class BookmarkService {
     return bookmarkRepository.delete(id, userId);
   }
 
-  getAllTags(): Tag[] {
-    return bookmarkRepository.getAllTags();
+  getAllTags(userId: number): Tag[] {
+    return bookmarkRepository.getTagsByUserId(userId);
   }
 
   private validateUrl(url: string): void {
