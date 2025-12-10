@@ -28,7 +28,7 @@ export const useDeleteComment = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, postId }: { id: number; postId: number }) => {
+    mutationFn: async ({ id }: { id: number; postId: number }) => {
       const { token } = await csrfApi.getCsrfToken();
       return commentsApi.deleteComment(id, token);
     },
