@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import {
   DropdownMenu,
@@ -16,11 +16,12 @@ export const Navbar = () => {
   const { data: userData } = useUser();
   const user = userData?.user;
   const logoutMutation = useLogout();
-
+  const navigate = useNavigate();
   const handleLogout = () => {
     logoutMutation.mutate(undefined, {
       onSuccess: () => {
         toast.success("Logged out successfully");
+        navigate("/");
       },
       onError: () => {
         toast.error("Failed to logout");
@@ -32,7 +33,10 @@ export const Navbar = () => {
     <nav className="border-b bg-background">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 font-semibold text-lg">
+          <Link
+            to="/"
+            className="flex items-center gap-2 font-semibold text-lg"
+          >
             <BookOpen className="h-5 w-5" />
             <span>Blog</span>
           </Link>
@@ -57,7 +61,9 @@ export const Navbar = () => {
                   <DropdownMenuContent align="end" className="w-56">
                     <DropdownMenuLabel>
                       <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">{user.name}</p>
+                        <p className="text-sm font-medium leading-none">
+                          {user.name}
+                        </p>
                         <p className="text-xs leading-none text-muted-foreground">
                           {user.email}
                         </p>
@@ -71,9 +77,14 @@ export const Navbar = () => {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout} disabled={logoutMutation.isPending}>
+                    <DropdownMenuItem
+                      onClick={handleLogout}
+                      disabled={logoutMutation.isPending}
+                    >
                       <LogOut className="mr-2 h-4 w-4" />
-                      <span>{logoutMutation.isPending ? "Logging out..." : "Logout"}</span>
+                      <span>
+                        {logoutMutation.isPending ? "Logging out..." : "Logout"}
+                      </span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
