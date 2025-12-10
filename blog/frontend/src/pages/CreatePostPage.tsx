@@ -1,5 +1,11 @@
 import { useNavigate, Link } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PostForm } from "@/components/posts";
 import { useCreatePost } from "@/lib/query";
@@ -25,29 +31,25 @@ export function CreatePostPage() {
   };
 
   const handleCancel = () => {
-    navigate("/posts");
+    navigate("/");
   };
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="border-b">
-        <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-4">
+        <div className="mx-auto max-w-4xl space-y-8">
           <Button asChild variant="ghost" size="sm">
-            <Link to="/posts">
+            <Link to="/">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Posts
             </Link>
           </Button>
-        </div>
-      </div>
-
-      <div className="container mx-auto px-4 py-8">
-        <div className="mx-auto max-w-3xl">
           <Card>
             <CardHeader>
               <CardTitle className="text-2xl">Create New Post</CardTitle>
               <CardDescription>
-                Write a new blog post. You can save it as a draft or publish it immediately.
+                Write a new blog post. You can save it as a draft or publish it
+                immediately.
               </CardDescription>
             </CardHeader>
             <CardContent>

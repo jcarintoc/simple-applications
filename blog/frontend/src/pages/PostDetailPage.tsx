@@ -1,7 +1,6 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { CommentForm, CommentsList } from "@/components/comments";
 import {
@@ -160,7 +159,6 @@ export function PostDetailPage() {
                 )}
               </div>
             </CardHeader>
-            <Separator />
             <CardContent className="pt-6">
               <div className="prose prose-slate max-w-none">
                 <p className="whitespace-pre-wrap text-base leading-relaxed">
@@ -172,7 +170,7 @@ export function PostDetailPage() {
 
           <Card>
             <CardHeader>
-              <h2 className="text-2xl font-bold">Comments</h2>
+              <h2 className="text-2xl font-bold">Comments ({comments.length})</h2>
             </CardHeader>
             <CardContent className="space-y-6">
               {commentsLoading ? (
@@ -192,23 +190,17 @@ export function PostDetailPage() {
               )}
 
               {user ? (
-                <>
-                  <Separator />
-                  <CommentForm
-                    onSubmit={handleCommentSubmit}
-                    isSubmitting={createCommentMutation.isPending}
-                  />
-                </>
+                <CommentForm
+                  onSubmit={handleCommentSubmit}
+                  isSubmitting={createCommentMutation.isPending}
+                />
               ) : (
-                <>
-                  <Separator />
-                  <div className="text-center text-muted-foreground">
-                    <p>Please log in to comment</p>
-                    <Button asChild className="mt-4">
-                      <Link to="/login">Login</Link>
-                    </Button>
-                  </div>
-                </>
+                <div className="text-center text-muted-foreground">
+                  <p>Please log in to comment</p>
+                  <Button asChild className="mt-4">
+                    <Link to="/login">Login</Link>
+                  </Button>
+                </div>
               )}
             </CardContent>
           </Card>

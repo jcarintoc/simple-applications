@@ -1,5 +1,11 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PostForm } from "@/components/posts";
 import { useGetPostById, useUpdatePost, useUser } from "@/lib/query";
@@ -70,7 +76,9 @@ export function EditPostPage() {
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold">Access Denied</h2>
-          <p className="mt-2 text-muted-foreground">You don't have permission to edit this post</p>
+          <p className="mt-2 text-muted-foreground">
+            You don't have permission to edit this post
+          </p>
           <Button asChild className="mt-4">
             <Link to={`/posts/${post.slug}`}>Back to Post</Link>
           </Button>
@@ -81,24 +89,20 @@ export function EditPostPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="border-b">
-        <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-4">
+        <div className="mx-auto max-w-4xl space-y-8">
           <Button asChild variant="ghost" size="sm">
             <Link to={`/posts/${post.slug}`}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Post
             </Link>
           </Button>
-        </div>
-      </div>
-
-      <div className="container mx-auto px-4 py-8">
-        <div className="mx-auto max-w-3xl">
           <Card>
             <CardHeader>
               <CardTitle className="text-2xl">Edit Post</CardTitle>
               <CardDescription>
-                Make changes to your post. Your changes will be saved when you click update.
+                Make changes to your post. Your changes will be saved when you
+                click update.
               </CardDescription>
             </CardHeader>
             <CardContent>

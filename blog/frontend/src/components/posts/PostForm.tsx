@@ -5,7 +5,11 @@ import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Checkbox } from "../ui/checkbox";
 import { Field, FieldLabel, FieldDescription, FieldError } from "../ui/field";
-import { createPostSchema, type CreatePostInput, type UpdatePostInput } from "@/lib/api";
+import {
+  createPostSchema,
+  type CreatePostInput,
+  type UpdatePostInput,
+} from "@/lib/api";
 import { Save, X } from "lucide-react";
 
 interface PostFormProps {
@@ -79,20 +83,23 @@ export const PostForm = ({
         render={({ field, fieldState }) => (
           <Field
             data-invalid={fieldState.invalid}
-            className="flex-row items-start space-x-3 space-y-0 rounded-md border p-4"
           >
-            <Checkbox
-              id={field.name}
-              checked={field.value}
-              onCheckedChange={field.onChange}
-              aria-invalid={fieldState.invalid}
-            />
-            <div className="space-y-1 leading-none">
-              <FieldLabel htmlFor={field.name}>Publish post</FieldLabel>
-              <FieldDescription>
-                Make this post visible to everyone. Uncheck to save as draft.
-              </FieldDescription>
+            <div className="flex items-start gap-4 border p-2">
+              <Checkbox
+                id={field.name}
+                checked={field.value}
+                onCheckedChange={field.onChange}
+                aria-invalid={fieldState.invalid}
+                className="mt-0.5"
+              />
+              <div className="space-y-1 leading-none">
+                <FieldLabel htmlFor={field.name}>Publish post</FieldLabel>
+                <FieldDescription>
+                  Make this post visible to everyone. Uncheck to save as draft.
+                </FieldDescription>
+              </div>
             </div>
+
             {fieldState.error && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
@@ -100,12 +107,17 @@ export const PostForm = ({
 
       <div className="flex gap-3">
         <Button type="submit" disabled={isSubmitting}>
-          <Save className="mr-2 h-4 w-4" />
+          <Save className="mr-1 h-4 w-4" />
           {isSubmitting ? "Saving..." : submitLabel}
         </Button>
         {onCancel && (
-          <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
-            <X className="mr-2 h-4 w-4" />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            disabled={isSubmitting}
+          >
+            <X className="mr-1 h-4 w-4" />
             Cancel
           </Button>
         )}

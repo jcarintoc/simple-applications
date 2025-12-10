@@ -1,4 +1,4 @@
-import { Trash2, User, Calendar } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 import type { CommentWithAuthor } from "@/lib/api";
@@ -10,7 +10,11 @@ interface CommentItemProps {
   isDeleting?: boolean;
 }
 
-export const CommentItem = ({ comment, onDelete, isDeleting }: CommentItemProps) => {
+export const CommentItem = ({
+  comment,
+  onDelete,
+  isDeleting,
+}: CommentItemProps) => {
   const { data } = useUser();
   const isAuthor = data?.user?.id === comment.author_id;
 
@@ -25,21 +29,31 @@ export const CommentItem = ({ comment, onDelete, isDeleting }: CommentItemProps)
   };
 
   return (
-    <Card>
-      <CardContent className="pt-4">
+    <Card className="m-0 gap-0 border-none p-4 shadow-none">
+      <CardContent className="p-0">
         <div className="flex items-start justify-between gap-4">
-          <div className="flex-1">
-            <div className="mb-2 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <User className="h-3.5 w-3.5" />
-                <span className="font-medium text-foreground">{comment.author_name}</span>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-3">
+              {/* Avatar */}
+              <div className="flex items-center justify-center p-2 w-10 h-10 rounded-full bg-blue-100">
+                <p className="text-lg font-medium text-black">
+                  {comment.author_name.charAt(0).toUpperCase()}
+                </p>
               </div>
-              <div className="flex items-center gap-1">
-                <Calendar className="h-3.5 w-3.5" />
-                <span>{formatDate(comment.created_at)}</span>
+              {/* Author Name and created at */}
+              <div className="flex flex-col gap-1">
+                <span className="font-medium text-foreground">
+                  {comment.author_name}
+                </span>
+                <span className="text-xs">
+                  {formatDate(comment.created_at)}
+                </span>
               </div>
             </div>
-            <p className="whitespace-pre-wrap text-sm leading-relaxed">{comment.content}</p>
+
+            <p className="whitespace-pre-wrap text-base leading-relaxed">
+              {comment.content}
+            </p>
           </div>
           {isAuthor && onDelete && (
             <Button

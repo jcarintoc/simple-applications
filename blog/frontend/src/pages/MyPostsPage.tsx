@@ -32,7 +32,7 @@ export function MyPostsPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 mb-8">
         <div className="mb-6">
           <h1 className="text-3xl font-bold">My Posts</h1>
           <p className="mt-1 text-muted-foreground">
