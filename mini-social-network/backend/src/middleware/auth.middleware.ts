@@ -26,3 +26,24 @@ export function authMiddleware(
     res.status(401).json({ error: "Token expired" });
   }
 }
+
+// Optional auth middleware - doesn't fail if not authenticated, just sets userId if available
+export function optionalAuthMiddleware(
+  req: AuthRequest,
+  _res: Response,
+  next: NextFunction
+): void {
+  const accessToken = req.cookies?.[config.cookies.access.name];
+
+  if (accessToken) {
+    try {
+      const payload = authService.verifyAccessToken(accessToken);
+      req.userId = payload.userId;
+    } catch {
+      // Token expired or invalid, but we don't fail the request
+      req.userId = undefined;
+    }
+  }
+
+  next();
+}

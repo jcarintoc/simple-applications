@@ -3,7 +3,7 @@ import {
   createRoutesFromElements,
   Route,
 } from "react-router-dom";
-import { LoginPage, RegisterPage, DashboardPage } from "@/pages";
+import { LoginPage, RegisterPage, FeedPage, UserProfilePage, PostPage } from "@/pages";
 import { ProtectedRoute, PublicRoute } from "@/components/routes";
 import MainLayout from "@/layout/MainLayout";
 
@@ -13,7 +13,9 @@ export const router = createBrowserRouter(
       {/* Protected Routes - require authentication */}
       <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
-          <Route path="/" element={<DashboardPage />} />
+          <Route path="/" element={<FeedPage />} />
+          <Route path="/users/:userId" element={<UserProfilePage />} />
+          <Route path="/posts/:postId" element={<PostPage />} />
         </Route>
       </Route>
 

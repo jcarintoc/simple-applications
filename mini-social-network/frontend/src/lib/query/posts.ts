@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { postsApi, type CreatePostData, type Post } from "../api/posts";
+import { postsApi, type CreatePostData } from "../api/posts";
 import { toast } from "sonner";
 
 // Query keys
