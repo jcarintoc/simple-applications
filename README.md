@@ -52,3 +52,6 @@ npm run dev
 | [`survey-creator`](./survey-creator) | Create surveys, vote, and view results (public browsing + auth for voting/creation). |
 | [`todo-app`](./todo-app) | Todos with pagination/filters/search, Zod validation, and CSRF cookie flow. |
 | [`amazon-clone`](./amazon-clone) | Amazon product page clone: product listings, shopping cart (session-based), checkout with CSRF protection. |
+| [`gmail-clone`](./gmail-clone) | Gmail inbox clone: send/receive emails, mark read/unread, archive, delete with CSRF protection on all email actions. |
+| [`airbnb`](./airbnb) | Airbnb listing clone: browse properties, create listings, book properties, and leave reviews with CSRF protection on bookings and reviews. |
+| [`linkedin-profile`](./linkedin-profile) | LinkedIn profile clone: view/edit profiles, send/accept connection requests, browse jobs, and apply with CSRF protection on all mutations. |
