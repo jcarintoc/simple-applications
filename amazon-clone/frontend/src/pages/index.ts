@@ -1,0 +1,8 @@
+export { LoginPage } from "./LoginPage";
+export { RegisterPage } from "./RegisterPage";
+export { DashboardPage } from "./DashboardPage";
+export { ProductsPage } from "./ProductsPage";
+export { ProductDetailPage } from "./ProductDetailPage";
+export { CartPage } from "./CartPage";
+export { CheckoutPage } from "./CheckoutPage";
+export { OrdersPage } from "./OrdersPage";

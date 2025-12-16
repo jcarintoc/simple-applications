@@ -51,3 +51,4 @@ npm run dev
 | [`password-generator`](./password-generator) | Password generation with optional saved history (auth) and CSRF-protected deletes. |
 | [`survey-creator`](./survey-creator) | Create surveys, vote, and view results (public browsing + auth for voting/creation). |
 | [`todo-app`](./todo-app) | Todos with pagination/filters/search, Zod validation, and CSRF cookie flow. |
+| [`amazon-clone`](./amazon-clone) | Amazon product page clone: product listings, shopping cart (session-based), checkout with CSRF protection. |
