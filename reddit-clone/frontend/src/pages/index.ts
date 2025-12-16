@@ -1,0 +1,9 @@
+export { LoginPage } from "./LoginPage";
+export { RegisterPage } from "./RegisterPage";
+export { DashboardPage } from "./DashboardPage";
+export { HomePage } from "./HomePage";
+export { SubredditsPage } from "./SubredditsPage";
+export { SubredditPage } from "./SubredditPage";
+export { PostDetailPage } from "./PostDetailPage";
+export { CreatePostPage } from "./CreatePostPage";
+export { CreateSubredditPage } from "./CreateSubredditPage";

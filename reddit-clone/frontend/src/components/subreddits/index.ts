@@ -1,0 +1,1 @@
+export { SubredditCard } from "./SubredditCard";
