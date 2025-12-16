@@ -55,3 +55,5 @@ npm run dev
 | [`gmail-clone`](./gmail-clone) | Gmail inbox clone: send/receive emails, mark read/unread, archive, delete with CSRF protection on all email actions. |
 | [`airbnb`](./airbnb) | Airbnb listing clone: browse properties, create listings, book properties, and leave reviews with CSRF protection on bookings and reviews. |
 | [`linkedin-profile`](./linkedin-profile) | LinkedIn profile clone: view/edit profiles, send/accept connection requests, browse jobs, and apply with CSRF protection on all mutations. |
+| [`reddit-clone`](./reddit-clone) | Reddit clone: subreddits, posts, nested comments, upvotes with CSRF protection on all mutations. |
+| [`instagram-clone`](./instagram-clone) | Instagram clone: photo feed, likes/comments, follow/unfollow, story viewing with CSRF protection on all mutations. |
