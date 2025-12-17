@@ -57,3 +57,5 @@ npm run dev
 | [`linkedin-profile`](./linkedin-profile) | LinkedIn profile clone: view/edit profiles, send/accept connection requests, browse jobs, and apply with CSRF protection on all mutations. |
 | [`reddit-clone`](./reddit-clone) | Reddit clone: subreddits, posts, nested comments, upvotes with CSRF protection on all mutations. |
 | [`instagram-clone`](./instagram-clone) | Instagram clone: photo feed, likes/comments, follow/unfollow, story viewing with CSRF protection on all mutations. |
+| [`booking-clone`](./booking-clone) | Booking.com clone: hotel search, reservations with CSRF protection, reviews (after checkout only), and saved properties. |
+| [`spotify-clone`](./spotify-clone) | Spotify playlist clone: browse songs, create playlists, add/remove songs, like/unlike tracks with CSRF protection on all mutations. |
