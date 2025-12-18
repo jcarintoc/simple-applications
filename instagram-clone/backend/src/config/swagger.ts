@@ -1127,7 +1127,7 @@ export const swaggerDocument = {
       get: {
         tags: ["Stories"],
         summary: "Get active stories",
-        description: "Returns all active stories (not expired). Requires authentication.",
+        description: "Returns all stories. Requires authentication.",
         security: [{ cookieAuth: [] }],
         responses: {
           200: {

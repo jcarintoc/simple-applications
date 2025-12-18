@@ -158,40 +158,23 @@ export function seedDatabase(): void {
     }
   }
 
-  // Create stories (some active, some expired)
-  const now = new Date();
-  const activeStories: Array<{ user_id: number; image_url: string; expires_at: Date }> = [];
-  const expiredStories: Array<{ user_id: number; image_url: string; expires_at: Date }> = [];
+  // Create stories (never expire - set to far future date)
+  const farFutureDate = new Date("2099-12-31T23:59:59");
+  const stories: Array<{ user_id: number; image_url: string; expires_at: Date }> = [];
 
-  // Active stories (expire in future)
-  for (let i = 0; i < 8; i++) {
-    const expiresAt = new Date(now.getTime() + (12 + i * 3) * 60 * 60 * 1000); // 12-36 hours from now
-    activeStories.push({
+  // Create stories for all users
+  for (let i = 0; i < 15; i++) {
+    stories.push({
       user_id: userIds[i % userIds.length],
       image_url: `https://picsum.photos/seed/story${i}/400/600`,
-      expires_at: expiresAt,
-    });
-  }
-
-  // Expired stories (expired in past)
-  for (let i = 0; i < 7; i++) {
-    const expiresAt = new Date(now.getTime() - (1 + i) * 60 * 60 * 1000); // 1-7 hours ago
-    expiredStories.push({
-      user_id: userIds[i % userIds.length],
-      image_url: `https://picsum.photos/seed/expired${i}/400/600`,
-      expires_at: expiresAt,
+      expires_at: farFutureDate,
     });
   }
 
   const insertStory = db.prepare("INSERT INTO stories (user_id, image_url, expires_at) VALUES (?, ?, ?)");
 
-  // Insert active stories
-  for (const story of activeStories) {
-    insertStory.run(story.user_id, story.image_url, story.expires_at.toISOString().replace("T", " ").substring(0, 19));
-  }
-
-  // Insert expired stories
-  for (const story of expiredStories) {
+  // Insert all stories
+  for (const story of stories) {
     insertStory.run(story.user_id, story.image_url, story.expires_at.toISOString().replace("T", " ").substring(0, 19));
   }
 
